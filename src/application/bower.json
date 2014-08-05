@@ -1,0 +1,17 @@
+{
+  "name": "src",
+  "version": "0.0.0",
+  "authors": [
+    "Taylor Savage <tjsavage@google.com>"
+  ],
+  "description": "Polymer dashboard",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

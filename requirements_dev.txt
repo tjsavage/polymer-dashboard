@@ -1,0 +1,9 @@
+# Development environment pip requirements file
+# Install via 'pip install -r requirements_dev.txt'
+
+# PIL
+flask
+jinja2
+simplejson
+unittest2
+pyGithub

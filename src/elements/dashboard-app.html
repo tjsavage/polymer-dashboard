@@ -1,0 +1,97 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" href="../bower_components/font-roboto/roboto.html">
+<link rel="import" href="../bower_components/core-icons/core-icons.html">
+<link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/core-selector/core-selector.html">
+<link rel="import" href="dashboard-module.html">
+<link rel="import" href="dashboard-service.html">
+
+<polymer-element name="dashboard-app" vertical layout>
+    <template>
+        <style>
+            :host {
+                background-color: #eee;
+                font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+            }
+
+            #module-board {
+                position: absolute;
+                top: 64px;
+                right: 0;
+                left: 0;
+                bottom: 0;
+            }
+
+            core-toolbar {
+                color: #f1f1f1;
+                fill: #f1f1f1;
+                background: #4285f4;
+            }
+
+            .core-selected {
+                width: 100%;
+                height: 300px;
+                transition: 1s;
+            }
+
+            dashboard-module {
+                width: calc(100% / 3);
+                height: calc(100% / 3);
+                float: left;
+                transition: 1s;
+            }
+
+            .content {
+                color: #232323;
+            }
+        </style>
+        <dashboard-service id="service" issues="{{data.issues}}"></dashboard-service>
+        <core-toolbar>
+            <span flex>Polymer Dashboard</span>
+            <paper-icon-button icon="refresh" on-tap="{{refreshAll}}"></paper-icon-button>
+        </core-toolbar>
+        <core-selector id="module-board" valueattr="id" selected="{{activeModule}}" tile-cascade fade>
+            <dashboard-module id="issues" module="issues">
+                <h1>Issues</h1>
+                <div class="content preview" layout vertical center center-justified>
+                    <label for="open-issues">Open Issues</label>
+                    <h2 name="open-issues">{{data.issues.currentSnapshot.issues_result.num_open}}</h2>
+                    <label for="open-unassigned-issues">Open Unassigned Issues</label>
+                    <h2 name="open-unassigned-issues">{{data.issues.currentSnapshot.issues_result.num_open_unassigned}}</h2>
+                </div>
+            </dashboard-module>
+            <dashboard-module id="twitter" module="twitter">
+                <h1>Twitter</h1>
+            </dashboard-module>
+            <dashboard-module id="polymer-dev" module="polymer-dev">
+                <h1>polymer-dev</h1>
+            </dashboard-module>
+            <dashboard-module id="cookbook" module="cookbook">
+                <h1>Cookbook</h1>
+            </dashboard-module>
+            <dashboard-module id="github-mentions" module="github-mentions">
+                <h1>Github Mentions</h1>
+            </dashboard-module>
+        </core-selector>
+    </template>
+    <script>
+        Polymer('dashboard-app', {
+            created: function() {
+                this.data = {
+                    issues: {}
+                }
+            },
+            ready: function() {
+            },
+            activeModuleChanged: function(oldVal, newVal) {
+                console.log(oldVal, newVal);
+            },
+            refreshAll: function() {
+                this.$.service.refreshAll();
+            }
+
+        });
+    </script>
+</polymer-element>

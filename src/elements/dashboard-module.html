@@ -1,0 +1,66 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-shadow/paper-shadow.html">
+
+
+<polymer-element name="dashboard-module" vertical layout attributes="module active">
+    <template>
+        <style>
+            .module-wrapper {
+                background-color: #333;
+                color: #fff;
+                margin: 10px;
+            }
+
+            .module-name {
+                background-color: #999;
+                height: 48px;
+            }
+
+            h1 {
+                font-size: 12px;
+                font-weight: normal;
+            }
+
+            .module-arrow {
+                color: #fff;
+                fill: #fff;
+            }
+
+            .bg {
+                background-color: #fff;
+            }
+
+            .tile {
+                position: relative;
+            }
+        </style>
+
+        <div class="module-wrapper" flex vertical layout>
+            <paper-shadow z="1" fit>
+                <div class="tile bg" dummy fit></div>
+                <div class="tile" flex vertical layout fit>
+                    <div flex relative>
+                        <div fit layout vertical center center-justified>
+                            <content select=".preview">
+                            </content>
+                        </div>
+                    </div>
+                    <div class="module-name" horizontal center layout center-justified>
+                        <content select="h1">
+                        </content select="h1">
+                    </div>
+                    <div class="content" flex relative center center-justified hidden?="{{!active}}">
+                        <span>TEST</span>
+                    </div>
+                </div>
+            </paper-shadow>
+        </div>
+    </template>
+    <script>
+        Polymer('dashboard-module', {
+            activeChanged: function() {
+                console.log(this.module, this.active);
+            }
+        });
+    </script>
+</polymer-element>
