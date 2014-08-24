@@ -1,0 +1,22 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+
+<polymer-element name="dashboard-service" attributes="issues">
+    <template>
+        <core-ajax auto id="issues" url="/api/github/?org=tjsavage-test-organization" handleAs="json" response="{{issues}}" on-core-response="{{handleIssues}}">
+        </core-ajax>
+    </template>
+    <script>
+        Polymer('dashboard-service', {
+            handleIssues: function() {
+                console.log(this.issues)
+            },
+            refreshIssues: function() {
+                this.$.issues.go();
+            },
+            refreshAll: function() {
+                this.refreshIssues();
+            }
+        });
+    </script>
+</polymer-element>

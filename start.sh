@@ -1,1 +1,1 @@
-dev_appserver.py src/
+dev_appserver.py .
