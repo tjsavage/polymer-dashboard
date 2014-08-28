@@ -14,4 +14,9 @@ indexes:
   properties:
   - name: github_org_name
   - name: requested_time
+
+- kind: GithubSnapshot
+  properties:
+  - name: github_org_name
+  - name: requested_time
     direction: desc

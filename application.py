@@ -17,6 +17,7 @@ app = webapp2.WSGIApplication([
 
     ('/api/github/', github.api.Index),
     ('/api/github/snapshots/', github.api.Snapshots),
+    ('/api/github/latest/', github.api.Latest),
     ('/tasks/github/take_snapshot/', github.tasks.SnapshotWorker)
 ])
 

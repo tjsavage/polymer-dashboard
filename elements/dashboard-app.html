@@ -9,8 +9,12 @@
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/core-icon-button/core-icon-button.html">
 <link rel="import" href="../bower_components/core-selector/core-selector.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="dashboard-module.html">
-<link rel="import" href="dashboard-service.html">
+<link rel="import" href="highcharts-timeseries.html">
+<link rel="import" href="github-issues-service.html">
+<link rel="import" href="github-issues-dashboard.html">
+<link rel="import" href="link-bar.html">
 
 <polymer-element name="dashboard-app" vertical layout>
     <template>
@@ -26,46 +30,60 @@
                 background: #4285f4;
             }
 
+            core-toolbar a {
+                text-decoration: none;
+                font-size: 14px;
+                color: #f1f1f1;
+            }
+
             #container {
                 overflow: auto;
             }
 
             .card {
                 position: relative;
-                height: 300px;
-                width: 300px;
+                padding: 20px;
                 font-size: 50px;
+                height: 100%;
                 margin: 8px;
-                background-color: steelblue;
+                background-color: white;
                 border-radius: 4px;
                 cursor: default;
             }
 
             .view {
-                font-size: 250px;
                 background-color: white;
             }
 
+            
+
         </style>
-        <dashboard-service id="service" issues="{{data.issues}}"></dashboard-service>
+        <github-issues-service id="issuesService" issues="{{data.issues}}"></github-issues-service>
         <core-toolbar>
             <core-icon-button icon="arrow-back" on-tap="{{back}}" hidden?="{{ $.pages.selected === 0 }}"></core-icon-button>
             <span flex>Polymer Dashboard</span>
+            <span>
+                <a href="https://docs.google.com/a/google.com/document/d/1sY5wOOhX1noystfR6jyUflgbKEW7H_kSOMxLTxBoOXY/edit?usp=sharing">Document a breaking change</a>
+            </span>
+            &nbsp; &nbsp;
+            <span>
+                <a href="https://docs.google.com/a/google.com/forms/d/1ClNQ3vh_NCyhjj9Xl_U7-HK3oYak7iHkRD-uJ-Lb7Jw/viewform">Submit a featured Polymer project</a>
+            </span>
             <paper-icon-button icon="refresh" on-tap="{{refreshAll}}"></paper-icon-button>
         </core-toolbar>
         
         <core-animated-pages id="pages" flex selected="0" on-core-animated-pages-transition-end="{{transitionEnd}}" transitions="cross-fade-all hero-transition">
             <section vertical layout>
                 <div id="container" flex horizontal wrap around-justified layout hero-p>
-                    <div class="card" vertical center layout hero-id="card-github" hero?="{{$.pages.selected === 1 || lastSelected === 1}}" on-tap="{{openGithubIssues}}">
-                        <span cross-fade>Github Issues</span>
+                    <div class="card" center layout hero-id="card-github" hero?="{{$.pages.selected === 1 || lastSelected === 1}}" on-tap="{{openGithubIssues}}">
+                        <highcharts-timeseries series="{{ data.issues.overviewSeries }}" title="Github Issues"></highcharts-timeseries>
                     </div>
                 </div>
             </section>
 
             <section vertical layout>
-                <div class="view" flex vertical center center-justified layout hero-id="card-github" hero?="{{$.pages.selected === 1 || $.pages.selected === 0}}">
-                    <span cross-fade>Github Issues</span>
+                <div class="view" flex horizontal hero-id="card-github" hero?="{{$.pages.selected === 1 || $.pages.selected === 0}}">
+                    <github-issues-dashboard issues="{{data.issues}}"></github-issues-dashboard>
                 </div>
             </section>
         </core-animated-pages>

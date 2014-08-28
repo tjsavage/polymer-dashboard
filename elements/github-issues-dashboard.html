@@ -1,0 +1,58 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/core-animated-pages/core-animated-pages.html">
+<link rel="import" href="../bower_components/paper-shadow/paper-shadow.html">
+
+<polymer-element name="github-issues-dashboard" attributes="issues">
+    <template>
+        <style>
+            ::host {
+                width: 100%;
+            }
+
+            paper-tabs.grey {
+                background-color: #ccc;
+            }
+
+            paper-tabs.grey::shadow #selectionBar {
+                background-color: #4285f4;
+            }
+
+            paper-tabs.grey paper-tab::shadow #ink {
+                color: #4285f4;
+            }
+
+            #content {
+                margin-top: 7px;
+            }
+
+            highcharts-timeseries {
+                margin: 7px;
+            }
+
+        </style>
+
+        <paper-tabs id="tabs" selected="0" id="tabs" class="grey" style="width: 100%">
+            <paper-tab>Time Series</paper-tab>
+            <paper-tab>Issue Management</paper-tab>
+        </paper-tabs>
+        <core-animated-pages id="pages" selected="{{$.tabs.selected}}" transitions="cross-fade">
+            <section>
+                <div cross-fade flex vertical center-justified layout id="timeseries">
+                    <highcharts-timeseries id="issues-chart" series="{{ issues.overviewSeries }}" title="Github Issues">
+                    </highcharts-timeseries>
+                    <highcharts-timeseries series="{{ issues.assigneeSeries }}" title="Assigned Issues"></highcharts-timeseries>
+                    <highcharts-timeseries series="{{ issues.repoSeries }}" title="Issues by Repo"></highcharts-timeseries>
+                </div>
+            </section>
+            <section>
+                <div cross-fade flex horizontal wrap around-justified layout id="management">
+                    <h1>Hi manage your issues here</h1>
+                </div>
+            </section>
+        </core-animated-pages>
+    </template>
+    <script>
+        Polymer({});
+    </script>
+</polymer-element>

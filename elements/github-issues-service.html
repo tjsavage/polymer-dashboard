@@ -1,0 +1,78 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+
+<polymer-element name="github-issues-service" attributes="issues">
+    <template>
+        <core-ajax auto id="issues" url="/api/github/?org=polymer" handleAs="json" response="{{issues}}" on-core-response="{{handleIssues}}">
+        </core-ajax>
+    </template>
+    <script>
+        Polymer('github-issues-service', {
+            handleIssues: function() {
+                console.log(this.issues);
+
+                var openIssuesSeries = [];
+                var openUnassignedIssuesSeries = [];
+                var assigneeSeriesDictionary = {};
+                var repoSeriesDictionary = {};
+                for(var i = 0; i < this.issues.snapshots.length; i++) {
+                    var snapshot = this.issues["snapshots"][i];
+                    var issues_result = snapshot["issues_result"];
+
+                    openIssuesSeries.push([Date.parse(snapshot["requested_time"]), issues_result["num_open"]]);
+                    openUnassignedIssuesSeries.push([Date.parse(snapshot["requested_time"]), issues_result["num_open_unassigned"]]);
+
+                    for(var assignee in issues_result["by_assignee"]) {
+                        if (!assigneeSeriesDictionary[assignee]) {
+                            assigneeSeriesDictionary[assignee] = [];
+                        }
+                        assigneeSeriesDictionary[assignee].push([Date.parse(snapshot["requested_time"]), issues_result["by_assignee"][assignee]]);
+                    }
+
+                    for(var repo in issues_result["by_repo"]) {
+                        if (!repoSeriesDictionary[repo]) {
+                            repoSeriesDictionary[repo] = [];
+                        }
+                        repoSeriesDictionary[repo].push([Date.parse(snapshot["requested_time"]), issues_result["by_repo"][repo]]);
+                    }
+                }
+
+                this.issues.overviewSeries = [
+                    {
+                        name: 'Open Issues',
+                        data: openIssuesSeries
+                    },
+                    {
+                        name: 'Open Unassigned Issues',
+                        data: openUnassignedIssuesSeries
+                    }
+                ];
+
+                var assigneeSeries = [];
+                for(var assignee in assigneeSeriesDictionary) {
+                    assigneeSeries.push({
+                        name: assignee,
+                        data: assigneeSeriesDictionary[assignee]
+                    });
+                }
+                this.issues.assigneeSeries = assigneeSeries;
+
+                var repoSeries = [];
+                for (var repo in repoSeriesDictionary) {
+                    repoSeries.push({
+                        name: repo,
+                        data: repoSeriesDictionary[repo]
+                    });
+                }
+                this.issues.repoSeries = repoSeries;
+
+            },
+            refreshIssues: function() {
+                this.$.issues.go();
+            },
+            refreshAll: function() {
+                this.refreshIssues();
+            }
+        });
+    </script>
+</polymer-element>

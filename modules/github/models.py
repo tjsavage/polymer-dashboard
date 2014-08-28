@@ -5,6 +5,7 @@ App Engine datastore models
 
 """
 
+import fix_path
 import json
 import datetime
 
@@ -22,12 +23,16 @@ class IssuesResult(ndb.Model):
     num_open = ndb.IntegerProperty()
     num_open_unassigned = ndb.IntegerProperty()
     num_open_unlabeled = ndb.IntegerProperty()
+    by_assignee = ndb.JsonProperty()
+    by_repo = ndb.JsonProperty()
 
     def as_dict(self):
         result = {}
         result["num_open"] = self.num_open
         result["num_open_unassigned"] = self.num_open_unassigned
         result["num_open_unlabeled"] = self.num_open_unlabeled
+        result["by_assignee"] = self.by_assignee
+        result["by_repo"] = self.by_repo
 
         return result
 
@@ -39,6 +44,12 @@ class GithubSnapshot(ndb.Model):
     github_org_name = ndb.StringProperty()
     snapshot_index = ndb.IntegerProperty()
     issues_result = ndb.StructuredProperty(IssuesResult)
+
+    @classmethod
+    def _pre_delete_hook(cls, key):
+        print "Deleting snapshot children"
+        child_issues = IssueSnapshot.query(IssueSnapshot.parent_snapshot == key).fetch(keys_only=True)
+        ndb.delete_multi(child_issues)
 
     def as_dict(self):
         result = {}
@@ -77,7 +88,7 @@ class IssueSnapshot(ndb.Model):
         result["labels"] = [l for l in self.labels]
         result["number"] = self.number
         result["num_comments"] = self.num_comments
-        result["parent_snapshot"] = self.parent_snapshot
+        # result["parent_snapshot"] = self.parent_snapshot.as_dict()
         result["repository"] = self.repository
         result["state"] = self.state
         result["title"] = self.title

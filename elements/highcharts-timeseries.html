@@ -1,0 +1,65 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+
+<polymer-element name="highcharts-timeseries" attributes="series title">
+    <template>
+        <style>
+            ::host {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            #container {
+                margin: 0 auto;
+                width: 100%;
+            }
+        </style>
+        <content>
+        </content>
+        <div id="container">
+        </div>
+
+    </template>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/highcharts.src.js"></script>
+    <script>
+        Polymer({
+            domReady: function() {
+                this.redrawChart();
+            },
+            redrawChart: function() {
+                var options = {
+                    chart: {
+                        renderTo: this.$.container,
+                        type: 'spline'
+                    },
+                    title: {
+                        text: this.title
+                    },
+                    xAxis: {
+                        type: 'datetime',
+                        dateTimeLabelFormats: {
+                            millisecond: '%H:%M',
+                            second: '%H:%M'
+                        },
+                        title: {
+                            text: 'Date'
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Num Issues'
+                        },
+                        min: 0
+                    },
+                    series: this.series
+                };
+
+                var chart  = new Highcharts.Chart(options);
+            },
+            seriesChanged: function(oldVal, newVal) {
+                this.redrawChart();
+            }
+        })
+    </script>
+</polymer-element>

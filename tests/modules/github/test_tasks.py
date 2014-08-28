@@ -34,5 +34,6 @@ class TakeSnapshotTestCase(GithubTestCase):
         assert snapshot_result.issues_result.num_open == 4
         assert snapshot_result.issues_result.num_open_unlabeled == 2
         assert snapshot_result.issues_result.num_open_unassigned == 3
+        assert snapshot_result.issues_result.by_assignee["tjsavage"] == 1
 
 

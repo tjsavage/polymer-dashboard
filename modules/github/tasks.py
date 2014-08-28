@@ -1,3 +1,4 @@
+import fix_path
 import json
 import sys
 import datetime
@@ -47,13 +48,20 @@ def take_issues_snapshot(github_org_name, parent_snapshot_key, save = True):
     for repo in repos:
         deferred.defer(take_repo_issues_snapshot, repo, parent_snapshot_key, save)
 
-
 def take_repo_issues_snapshot(github_repo, parent_snapshot_key, save = True):
     num_open = 0
     num_open_unassigned = 0
     num_open_unlabeled = 0
     try:
         issues = github_repo.get_issues(state="open")
+        if parent_snapshot_key:
+            parent_snapshot = parent_snapshot_key.get()
+            if not parent_snapshot.issues_result.by_assignee:
+                parent_snapshot.issues_result.by_assignee = {}
+                parent_snapshot.put()
+            if not parent_snapshot.issues_result.by_repo:
+                parent_snapshot.issues_result.by_repo = {}
+                parent_snapshot.put()
 
         for issue in issues:
             issue_snapshot = IssueSnapshot.from_github_issue(issue)
@@ -68,11 +76,19 @@ def take_repo_issues_snapshot(github_repo, parent_snapshot_key, save = True):
             if issue_snapshot.state == 'open' and (issue_snapshot.labels == None or len(issue_snapshot.labels)) == 0:
                 num_open_unlabeled +=1
 
+            if issue_snapshot.assignee and issue_snapshot.assignee in parent_snapshot.issues_result.by_assignee:
+                parent_snapshot.issues_result.by_assignee[issue_snapshot.assignee] += 1
+            elif issue_snapshot.assignee:
+                parent_snapshot.issues_result.by_assignee[issue_snapshot.assignee] = 1
+
         if parent_snapshot_key:
             parent_snapshot = parent_snapshot_key.get()
             parent_snapshot.issues_result.num_open += num_open
             parent_snapshot.issues_result.num_open_unassigned += num_open_unassigned
             parent_snapshot.issues_result.num_open_unlabeled += num_open_unlabeled
+
+            parent_snapshot.issues_result.by_repo[github_repo.name] = num_open
+
             parent_snapshot.put()
     except GithubException:
         pass
