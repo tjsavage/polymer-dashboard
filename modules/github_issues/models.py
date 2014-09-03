@@ -112,7 +112,7 @@ class GithubIssue(ndb.Model):
 
         return result
 
-    def update_to_github_issue(self, github_issue):
+    def update_to_github_issue(self, github_issue, repository_name = None):
         updated = False
         if self.assignee != (github_issue.assignee.login if github_issue.assignee else None):
             self.assignee = github_issue.assignee.login if github_issue.assignee else None
@@ -138,8 +138,8 @@ class GithubIssue(ndb.Model):
         if self.num_comments != github_issue.comments:
             self.num_comments = github_issue.comments
             updated = True
-        if self.repository != github_issue.repository.name:
-            self.repository = github_issue.repository.name
+        if self.repository != (repository_name if repository_name else github_issue.repository.name):
+            self.repository = (repository_name if repository_name else github_issue.repository.name)
             updated = True
         if self.state != github_issue.state:
             self.state = github_issue.state

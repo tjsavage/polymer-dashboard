@@ -40,13 +40,15 @@ def take_snapshot(github_org_name, requested_time):
     for github_api_repo in github_api_repos:
         repo_issues_result = sync_repo_issues_to_datastore(github_api_repo)
         snapshot.issues_result.merge(repo_issues_result)
-        print "Synced %s" % github_api_repo.name
+    #    print "Synced %s" % github_api_repo.name
 
     snapshot.put()
 
     return snapshot
 
 def sync_repo_issues_to_datastore(github_api_repo):
+    repository_name = github_api_repo.name
+
     repo_api_issues = github_api_repo.get_issues(state='all')
     repo_datastore_issues = GithubIssue.query(GithubIssue.repository == github_api_repo.name).fetch()
 
@@ -58,12 +60,13 @@ def sync_repo_issues_to_datastore(github_api_repo):
     for repo_api_issue in repo_api_issues:
         if repo_api_issue.id in repo_datastore_issues_by_github_id:
             datastore_issue = repo_datastore_issues_by_github_id[repo_api_issue.id]
-            updated = datastore_issue.update_to_github_issue(repo_api_issue)
+            updated = datastore_issue.update_to_github_issue(repo_api_issue, repository_name=repository_name)
             #if updated:
             #    datastore_issue.put()
         else:
-            datastore_issue = GithubIssue.from_github_issue(repo_api_issue)
+            datastore_issue = GithubIssue.from_github_issue(repo_api_issue, repository_name=repository_name)
             #datastore_issue.put()
+        # print "\t%s" % datastore_issue.title
         datastore_issues_to_put.append(datastore_issue)
 
         if datastore_issue.state == 'open':
@@ -78,8 +81,8 @@ def sync_repo_issues_to_datastore(github_api_repo):
             else:
                 issues_result.by_assignee[datastore_issue.assignee] = 1
 
-    ndb.put(datastore_issues_to_put)
-     
+    ndb.put_multi(datastore_issues_to_put)
+
     issues_result.by_repo[github_api_repo.name] = issues_result.num_open
 
     return issues_result
