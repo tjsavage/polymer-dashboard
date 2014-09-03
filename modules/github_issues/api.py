@@ -6,7 +6,7 @@ import webapp2
 from google.appengine.ext import ndb
 from github import Github
 
-from models import IssueSnapshot, GithubSnapshot
+from models import GithubIssue, GithubSnapshot
 import tasks
 
 class Index(webapp2.RequestHandler):

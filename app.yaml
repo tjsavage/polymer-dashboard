@@ -1,4 +1,4 @@
-application: google.com:polymer-dashboard
+application: polymer-project-dashboard
 version: 1
 runtime: python27
 api_version: 1
@@ -17,6 +17,8 @@ libraries:
   version: "2.6"
 - name: markupsafe
   version: "0.15"
+- name: webapp2
+  version: "latest"
 
 inbound_services:
 - warmup
@@ -38,6 +40,10 @@ handlers:
 
 - url: /elements
   static_dir: elements
+
+- url: /remoteapi.*
+  script: google.appengine.ext.remote_api.handler.application
+  login: admin
 
 - url: .*
   script: application.app

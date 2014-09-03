@@ -1,0 +1,116 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+
+<polymer-element name="stackoverflow-service" attributes="questions">
+    <template>
+        <core-ajax auto id="issues" url="/api/stackoverflow/" handleAs="json" response="{{questions}}" on-core-response="{{handleData}}">
+        </core-ajax>
+    </template>
+    <script>
+        Polymer({
+            handleData: function() {
+                console.log(this.questions);
+
+                var totalQuestionsSeries = [];
+                var answeredQuestionsSeries = [];
+                var unansweredQuestionsSeries = [];
+                var totalQuestionViewsSeries = [];
+
+                for (var i = 0; i < this.questions["snapshots"].length; i++) {
+                    var snapshot = this.questions["snapshots"][i];
+
+                    totalQuestionsSeries.push([Date.parse(snapshot["requested_time"]), snapshot["num_tagged_questions"]]);
+                    answeredQuestionsSeries.push([Date.parse(snapshot["requested_time"]), snapshot["num_answered"]]);
+                    unansweredQuestionsSeries.push([Date.parse(snapshot["requested_time"]), snapshot["num_unanswered"]]);
+                    totalQuestionViewsSeries.push([Date.parse(snapshot["requested_time"]), snapshot["total_question_views"]]);
+                }
+
+                this.questions.overviewSeries = [
+                    {
+                        name: 'Total Questions',
+                        data: totalQuestionsSeries
+                    },
+                    {
+                        name: 'Answered Questions',
+                        data: answeredQuestionsSeries
+                    },
+                    {
+                        name: 'Unanswered Questions',
+                        data: unansweredQuestionsSeries
+                    }
+                ];
+
+                this.questions.totalQuestionViewsSeries = [
+                    {
+                        name: 'Total Question Views',
+                        data: totalQuestionViewsSeries
+                    }
+                ];
+            }
+                /*
+                var openIssuesSeries = [];
+                var openUnassignedIssuesSeries = [];
+                var assigneeSeriesDictionary = {};
+                var repoSeriesDictionary = {};
+                for(var i = 0; i < this.issues.snapshots.length; i++) {
+                    var snapshot = this.issues["snapshots"][i];
+                    var issues_result = snapshot["issues_result"];
+
+                    openIssuesSeries.push([Date.parse(snapshot["requested_time"]), issues_result["num_open"]]);
+                    openUnassignedIssuesSeries.push([Date.parse(snapshot["requested_time"]), issues_result["num_open_unassigned"]]);
+
+                    for(var assignee in issues_result["by_assignee"]) {
+                        if (!assigneeSeriesDictionary[assignee]) {
+                            assigneeSeriesDictionary[assignee] = [];
+                        }
+                        assigneeSeriesDictionary[assignee].push([Date.parse(snapshot["requested_time"]), issues_result["by_assignee"][assignee]]);
+                    }
+
+                    for(var repo in issues_result["by_repo"]) {
+                        if (!repoSeriesDictionary[repo]) {
+                            repoSeriesDictionary[repo] = [];
+                        }
+                        repoSeriesDictionary[repo].push([Date.parse(snapshot["requested_time"]), issues_result["by_repo"][repo]]);
+                    }
+                }
+
+                this.issues.overviewSeries = [
+                    {
+                        name: 'Open Issues',
+                        data: openIssuesSeries
+                    },
+                    {
+                        name: 'Open Unassigned Issues',
+                        data: openUnassignedIssuesSeries
+                    }
+                ];
+
+                var assigneeSeries = [];
+                for(var assignee in assigneeSeriesDictionary) {
+                    assigneeSeries.push({
+                        name: assignee,
+                        data: assigneeSeriesDictionary[assignee]
+                    });
+                }
+                this.issues.assigneeSeries = assigneeSeries;
+
+                var repoSeries = [];
+                for (var repo in repoSeriesDictionary) {
+                    repoSeries.push({
+                        name: repo,
+                        data: repoSeriesDictionary[repo]
+                    });
+                }
+                this.issues.repoSeries = repoSeries;
+
+            },
+            refreshIssues: function() {
+                this.$.issues.go();
+            },
+            refreshAll: function() {
+                this.refreshIssues();
+            }
+            */
+        });
+    </script>
+</polymer-element>

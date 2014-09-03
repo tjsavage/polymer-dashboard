@@ -10,7 +10,7 @@ Important: Place your keys in the secret_keys.py module,
 
 import os
 
-from secret_keys import CSRF_SECRET_KEY, SESSION_KEY, SECRET_GITHUB_USERNAME, SECRET_GITHUB_PASSWORD
+from secret_keys import CSRF_SECRET_KEY, SESSION_KEY, SECRET_GITHUB_USERNAME, SECRET_GITHUB_PASSWORD, SECRET_STACKEXCHANGE_KEY
 
 class Config(object):
     # Set secret keys for CSRF protection
@@ -21,6 +21,8 @@ class Config(object):
     # Github logins
     GITHUB_USERNAME = SECRET_GITHUB_USERNAME
     GITHUB_PASSWORD = SECRET_GITHUB_PASSWORD
+    # Stachexchange logins
+    STACKEXCHANGE_KEY = SECRET_STACKEXCHANGE_KEY
 
 class Development(Config):
     DEBUG = True
