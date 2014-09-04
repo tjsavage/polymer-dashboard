@@ -207,6 +207,9 @@ class Requester:
         def encode(input):
             return "application/json", json.dumps(input)
 
+        #import traceback
+        #traceback.print_stack()
+
         return self.__requestEncode(cnx, verb, url, parameters, headers, input, encode)
 
     def requestMultipart(self, verb, url, parameters=None, headers=None, input=None):

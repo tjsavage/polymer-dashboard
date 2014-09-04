@@ -19,6 +19,10 @@ dthandler = lambda obj: (
     else None
 )
 
+utf8handler = lambda obj: (
+    unicode(obj).encode('ascii', 'ignore')
+)
+
 class IssuesResult(ndb.Model):
     num_open = ndb.IntegerProperty()
     num_open_unassigned = ndb.IntegerProperty()
@@ -90,7 +94,6 @@ class GithubIssue(ndb.Model):
     state = ndb.StringProperty()
     title = ndb.StringProperty()
     html_url = ndb.StringProperty()
-    pull_request_html_url = ndb.StringProperty()
 
     def as_dict(self):
         result = {}
@@ -108,17 +111,16 @@ class GithubIssue(ndb.Model):
         result["state"] = self.state
         result["title"] = self.title
         result["html_url"] = self.html_url
-        result["pull_request_html_url"] = self.pull_request_html_url
 
         return result
 
     def update_to_github_issue(self, github_issue, repository_name = None):
         updated = False
-        if self.assignee != (github_issue.assignee.login if github_issue.assignee else None):
-            self.assignee = github_issue.assignee.login if github_issue.assignee else None
+        if self.assignee != (utf8handler(github_issue.assignee.login) if github_issue.assignee else None):
+            self.assignee = utf8handler(github_issue.assignee.login) if github_issue.assignee else None
             updated = True
-        if self.body != github_issue.body:
-            self.body = github_issue.body
+        if self.body != utf8handler(github_issue.body) if github_issue.body else None:
+            self.body = utf8handler(github_issue.body) if github_issue.body else None
             updated = True
         if self.closed_at != github_issue.closed_at:
             self.closed_at = github_issue.closed_at
@@ -129,8 +131,8 @@ class GithubIssue(ndb.Model):
         if self.github_id != github_issue.id:
             self.github_id = github_issue.id
             updated = True
-        if self.labels != [l.name for l in github_issue.labels]:
-            self.labels = [l.name for l in github_issue.labels]
+        if self.labels != [utf8handler(l.name) for l in github_issue.labels]:
+            self.labels = [utf8handler(l.name) for l in github_issue.labels]
             updated = True
         if self.number != github_issue.number:
             self.number = github_issue.number
@@ -138,38 +140,35 @@ class GithubIssue(ndb.Model):
         if self.num_comments != github_issue.comments:
             self.num_comments = github_issue.comments
             updated = True
-        if self.repository != (repository_name if repository_name else github_issue.repository.name):
-            self.repository = (repository_name if repository_name else github_issue.repository.name)
+        if self.repository != (repository_name if repository_name else utf8handler(github_issue.repository.name)):
+            self.repository = (repository_name if repository_name else utf8handler(github_issue.repository.name))
             updated = True
         if self.state != github_issue.state:
             self.state = github_issue.state
             updated = True
-        if self.title != github_issue.title:
-            self.title = github_issue.title
+        if self.title != utf8handler(github_issue.title) if github_issue.title else None:
+            self.title = utf8handler(github_issue.title) if github_issue.title else None
             updated = True
         if self.html_url != github_issue.html_url:
             self.html_url = github_issue.html_url
             updated = True
-        if self.pull_request_html_url != github_issue.pull_request.html_url if github_issue.pull_request else None:
-            self.pull_request_html_url = github_issue.pull_request.html_url if github_issue.pull_request else None
-            updated = True
+
         return updated
 
     @classmethod
     def from_github_issue(cls, github_issue, repository_name = None):
         issue = cls(
-            assignee = github_issue.assignee.login if github_issue.assignee else None,
-            body = github_issue.body,
+            assignee = utf8handler(github_issue.assignee.login) if github_issue.assignee else None,
+            body = utf8handler(github_issue.body),
             closed_at = github_issue.closed_at,
             created_at = github_issue.created_at,
             github_id = github_issue.id,
-            labels = [l.name for l in github_issue.labels],
+            labels = [utf8handler(l.name) for l in github_issue.labels],
             number = github_issue.number,
             num_comments = github_issue.comments,
-            repository = repository_name if repository_name else github_issue.repository.name,
+            repository = repository_name if repository_name else utf8handler(github_issue.repository.name),
             state = github_issue.state,
-            title = github_issue.title,
-            html_url = github_issue.html_url,
-            pull_request_html_url = github_issue.pull_request.html_url if github_issue.pull_request else None
+            title = utf8handler(github_issue.title),
+            html_url = github_issue.html_url
         )
         return issue

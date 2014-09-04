@@ -40,7 +40,7 @@ def take_snapshot(github_org_name, requested_time):
     for github_api_repo in github_api_repos:
         repo_issues_result = sync_repo_issues_to_datastore(github_api_repo)
         snapshot.issues_result.merge(repo_issues_result)
-    #    print "Synced %s" % github_api_repo.name
+        print "Synced %s" % github_api_repo.name
 
     snapshot.put()
 
@@ -66,7 +66,7 @@ def sync_repo_issues_to_datastore(github_api_repo):
         else:
             datastore_issue = GithubIssue.from_github_issue(repo_api_issue, repository_name=repository_name)
             #datastore_issue.put()
-        # print "\t%s" % datastore_issue.title
+        print "\t%s" % datastore_issue.title
         datastore_issues_to_put.append(datastore_issue)
 
         if datastore_issue.state == 'open':
