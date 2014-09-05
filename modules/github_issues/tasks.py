@@ -20,8 +20,13 @@ class SnapshotWorker(webapp2.RequestHandler):
         index = int(self.request.get("index")) if self.request.get("index") else None
         requested_time = datetime.datetime.now()
 
-        deferred.defer(take_snapshot, github_org_name, requested_time)
-        return self.response.write("Taking snapshot...")
+        task = deferred.defer(take_snapshot, github_org_name, requested_time, _queue="github")
+
+        self.response.headers['Content-Type'] = 'text/json'
+        return self.response.write(json.dumps({
+            "status": "started",
+            "task_name": task.name
+        }))
 
 class DeleteAllWorker(webapp2.RequestHandler):
     def get(self):
@@ -32,16 +37,32 @@ class DeleteAllWorker(webapp2.RequestHandler):
 
 def take_snapshot(github_org_name, requested_time):
     snapshot = GithubSnapshot(requested_time = requested_time,
-                                    github_org_name = github_org_name)
+                                    github_org_name = github_org_name,
+                                    status='started')
 
     snapshot.issues_result = IssuesResult.empty_result()
-
+    snapshot.put()
+    
     github_api_repos = g.get_organization(github_org_name).get_repos()
-    for github_api_repo in github_api_repos:
-        repo_issues_result = sync_repo_issues_to_datastore(github_api_repo)
-        snapshot.issues_result.merge(repo_issues_result)
-        print "Synced %s" % github_api_repo.name
 
+    repo_on = 0
+    snapshot.status = 'pending'
+    snapshot.put()
+    try:
+        for github_api_repo in github_api_repos:        
+            repo_issues_result = sync_repo_issues_to_datastore(github_api_repo)
+            snapshot.issues_result.merge(repo_issues_result)
+            # print "Synced %s" % github_api_repo.name
+
+            repo_on += 1
+            snapshot.status_string = "Synced %d repos" % repo_on
+            snapshot.put()
+    except:
+        snapshot.status = 'failed'
+        snapshot.put()
+        raise
+
+    snapshot.status = 'complete'
     snapshot.put()
 
     return snapshot
@@ -66,7 +87,7 @@ def sync_repo_issues_to_datastore(github_api_repo):
         else:
             datastore_issue = GithubIssue.from_github_issue(repo_api_issue, repository_name=repository_name)
             #datastore_issue.put()
-        print "\t%s" % datastore_issue.title
+        # print "\t%s" % datastore_issue.title
         datastore_issues_to_put.append(datastore_issue)
 
         if datastore_issue.state == 'open':

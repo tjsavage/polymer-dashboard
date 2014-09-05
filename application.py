@@ -19,6 +19,7 @@ app = webapp2.WSGIApplication([
     ('/api/github/', modules.github_issues.api.Index),
     ('/api/github/snapshots/', modules.github_issues.api.Snapshots),
     ('/api/github/latest/', modules.github_issues.api.Latest),
+    ('/api/github/snapshot_status/', modules.github_issues.api.SnapshotStatus),
     ('/tasks/github/take_snapshot/', modules.github_issues.tasks.SnapshotWorker),
     ('/tasks/github/delete/', modules.github_issues.tasks.DeleteAllWorker),
 

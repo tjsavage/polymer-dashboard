@@ -10,13 +10,12 @@
 <link rel="import" href="../bower_components/core-icon-button/core-icon-button.html">
 <link rel="import" href="../bower_components/core-selector/core-selector.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="dashboard-module.html">
 <link rel="import" href="highcharts-timeseries.html">
 <link rel="import" href="github-issues-service.html">
 <link rel="import" href="stackoverflow-service.html">
 <link rel="import" href="github-issues-dashboard.html">
 <link rel="import" href="stackoverflow-dashboard.html">
-<link rel="import" href="link-bar.html">
+<link rel="import" href="snapshot-handler.html">
 
 <polymer-element name="dashboard-app" vertical layout>
     <template>
@@ -72,8 +71,9 @@
             <span>
                 <a href="https://docs.google.com/a/google.com/forms/d/1ClNQ3vh_NCyhjj9Xl_U7-HK3oYak7iHkRD-uJ-Lb7Jw/viewform">Submit a featured Polymer project</a>
             </span>
-            <paper-icon-button icon="refresh" on-tap="{{refreshAll}}"></paper-icon-button>
+            <paper-icon-button icon="refresh" on-tap="{{takeSnapshots}}"></paper-icon-button>
         </core-toolbar>
+        <snapshot-handler id="snapshotHandler"></snapshot-handler>
         
         <core-animated-pages id="pages" flex selected="0" on-core-animated-pages-transition-end="{{transitionEnd}}" transitions="cross-fade-all hero-transition">
             <section vertical layout>
@@ -99,6 +99,8 @@
                 </div>
             </section>
         </core-animated-pages>
+
+
     </template>
     <script>
         Polymer('dashboard-app', {
@@ -130,6 +132,9 @@
             },
             refreshAll: function() {
                 this.$.service.refreshAll();
+            },
+            takeSnapshots: function() {
+                this.$.snapshotHandler.takeSnapshots();
             }
 
         });

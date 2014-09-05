@@ -1,7 +1,7 @@
 cron:
-- description: snapshotting issues
-  url: /tasks/github/take_snapshot/?org=polymer
-  schedule: every 6 hours
+#- description: snapshotting issues
+#  url: /tasks/github/take_snapshot/?org=polymer
+#  schedule: every 6 hours
 
 - description: snapshotting stackoverflow
   url: /tasks/stackoverflow/take_snapshot/

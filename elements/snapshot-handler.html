@@ -1,0 +1,40 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+
+<polymer-element name="snapshot-handler" attributes="issues">
+    <template>
+        <core-ajax id="issues" url="/tasks/github/take_snapshot/?org=polymer" on-core-response="{{startedIssuesSnapshot}}" handleAs="json">
+        </core-ajax>
+        <core-ajax id="issuesStatusGetter" url="/api/github/snapshot_status/?org=polymer" handleAs="json" response="{{issuesStatus}}" on-core-response="{{handleIssuesStatus}}"></core-ajax>
+        <paper-toast id="issuesToast" text="{{issuesStatusText}}"></paper-toast>
+    </template>
+    <script>
+        Polymer({
+            ready: function() {
+                this.issuesStatusText = "Starting snapshots";
+            },
+            takeSnapshots: function() {
+                this.$.issues.go();
+            },
+            startedIssuesSnapshot: function() {
+                this.pollIssuesStatus();
+                this.$.issuesToast.show();
+            },
+            pollIssuesStatus: function() {
+                if (!this.issuesStatus || this.issuesStatus["status"] == "started" || this.issuesStatus["status"] == "pending") {
+                    this.$.issuesStatusGetter.go();
+                    this.issuesStatusText = this.issuesStatus ? this.issuesStatus["status_string"] : "Fetching snapshots...";
+                    setTimeout(this.pollIssuesStatus.bind(this), 1000);
+                    this.$.issuesToast.show();
+                } else if (this.issuesStatus["status"] == "complete") {
+                    this.issuesStatusText = "Complete! Synced all repos";
+                    this.$.issuesToast.show();
+                }
+            },
+            handleIssuesStatus: function() {
+                console.log(this.issuesStatus);
+            }
+        });
+    </script>
+</polymer-element>

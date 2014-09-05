@@ -27,3 +27,9 @@ indexes:
   - name: github_org_name
   - name: requested_time
     direction: desc
+
+- kind: GithubSnapshot
+  properties:
+  - name: github_org_name
+  - name: status
+  - name: requested_time

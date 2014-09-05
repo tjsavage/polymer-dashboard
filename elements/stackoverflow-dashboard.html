@@ -39,7 +39,7 @@
         <core-animated-pages id="pages" selected="{{$.tabs.selected}}" transitions="cross-fade">
             <section>
                 <div cross-fade flex vertical center-justified layout id="timeseries">
-                    <highcharts-timeseries horizontal center-justified layout id="issues-chart" series="{{ questions.overviewSeries }}" title="Github Issues">
+                    <highcharts-timeseries horizontal center-justified layout id="issues-chart" series="{{ questions.overviewSeries }}" title="Stackoverflow Questions">
                     </highcharts-timeseries>
                     <highcharts-timeseries series="{{ questions.totalQuestionViewsSeries }}" title="Total Views"></highcharts-timeseries>
                 </div>

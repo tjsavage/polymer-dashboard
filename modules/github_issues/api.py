@@ -17,7 +17,7 @@ class Index(webapp2.RequestHandler):
                     "type": "Error",
                     "body": "Bad org name"
                 }))
-        qry = GithubSnapshot.query(GithubSnapshot.github_org_name == org).order(GithubSnapshot.requested_time)
+        qry = GithubSnapshot.query(ndb.AND(GithubSnapshot.github_org_name == org, GithubSnapshot.status == 'complete')).order(GithubSnapshot.requested_time)
         results = qry.fetch()
 
         result = {}
@@ -28,7 +28,7 @@ class Index(webapp2.RequestHandler):
 
 class Snapshots(webapp2.RequestHandler):
     def get(self):
-        qry = GithubSnapshot.query().order(GithubSnapshot.requested_time)
+        qry = GithubSnapshot.query(GithubSnapshot.status == 'complete').order(GithubSnapshot.requested_time)
         results = qry.fetch()
 
         self.response.headers['Content-Type'] = 'text/json'
@@ -58,3 +58,15 @@ class Latest(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/json'
         return self.response.write(json.dumps(result))
 
+class SnapshotStatus(webapp2.RequestHandler):
+    def get(self):
+        org = self.request.get("org")
+        if not org or len(org) == 0:
+            return self.response.write(json.dumps({
+                    "type": "Error",
+                    "body": "Bad org name"
+                }))
+        qry = GithubSnapshot.query(GithubSnapshot.github_org_name == org).order(-GithubSnapshot.requested_time)
+        snapshot = qry.get();
+
+        return self.response.write(json.dumps(snapshot.as_dict()))

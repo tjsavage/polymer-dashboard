@@ -67,6 +67,8 @@ class GithubSnapshot(ndb.Model):
     requested_time = ndb.DateTimeProperty(required=True)
     github_org_name = ndb.StringProperty()
     issues_result = ndb.StructuredProperty(IssuesResult)
+    status = ndb.StringProperty()
+    status_string = ndb.StringProperty()
 
     def as_dict(self):
         result = {}
@@ -74,6 +76,8 @@ class GithubSnapshot(ndb.Model):
         result["requested_time"] = dthandler(self.requested_time)
         result["github_org_name"] = self.github_org_name
         result["issues_result"] = self.issues_result.as_dict()
+        result["status"] = self.status
+        result["status_string"] = self.status_string
 
         return result
 
