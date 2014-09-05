@@ -8,14 +8,21 @@
         </core-ajax>
         <core-ajax id="issuesStatusGetter" url="/api/github/snapshot_status/?org=polymer" handleAs="json" response="{{issuesStatus}}" on-core-response="{{handleIssuesStatus}}"></core-ajax>
         <paper-toast id="issuesToast" text="{{issuesStatusText}}"></paper-toast>
+
+        <core-ajax id="stackoverflow" url="/tasks/stackoverflow/take_snapshot/" on-core-response="{{startedStackOverflowSnapshot}}" handleAs="json">
+        </core-ajax>
+        <core-ajax id="stackoverflowStatusGetter" url="/api/stackoverflow/snapshot_status/" handleAs="json" response="{{stackoverflowStatus}}" on-core-response="{{handleStackOverflowStatus}}"></core-ajax>
+        <paper-toast id="stackoverflowToast" text="{{stackoverflowStatusText}}"></paper-toast>
     </template>
     <script>
         Polymer({
             ready: function() {
-                this.issuesStatusText = "Starting snapshots";
+                this.issuesStatusText = "Starting github snapshot";
+                this.stackoverflowStatusText = "Starting StackOverflow snapshot"
             },
             takeSnapshots: function() {
                 this.$.issues.go();
+                this.$.stackoverflow.go();
             },
             startedIssuesSnapshot: function() {
                 this.pollIssuesStatus();
@@ -34,6 +41,25 @@
             },
             handleIssuesStatus: function() {
                 console.log(this.issuesStatus);
+            },
+
+            startedStackOverflowSnapshot: function() {
+                this.pollStackOverflowStatus();
+                this.$.stackoverflowToast.show();
+            },
+            pollStackOverflowStatus: function() {
+                if (!this.stackoverflowStatus || this.stackoverflowStatus["status"] == "started" || this.stackoverflowStatus["status"] == "pending") {
+                    this.$.stackoverflowStatusGetter.go();
+                    this.stackoverflowStatusText = this.stackoverflowStatus ? this.stackoverflowStatus["status_string"] : "Fetching StackOverflow questions...";
+                    setTimeout(this.pollStackOverflowStatus.bind(this), 1000);
+                    this.$.stackoverflowToast.show();
+                } else if (this.stackoverflowStatus["status"] == "complete") {
+                    this.stackoverflowStatusText = "Complete! Synced StackOverflow questions";
+                    this.$.stackoverflowToast.show();
+                }
+            },
+            handleIssuesStatus: function() {
+                console.log(this.stackoverflowStatus);
             }
         });
     </script>

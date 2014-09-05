@@ -21,6 +21,8 @@ class StackOverflowSnapshot(ndb.Model):
     num_answered = ndb.IntegerProperty()
     num_unanswered = ndb.IntegerProperty()
     total_question_views = ndb.IntegerProperty()
+    status = ndb.StringProperty()
+    status_string = ndb.StringProperty()
 
     def as_dict(self):
         result = {}
@@ -30,6 +32,8 @@ class StackOverflowSnapshot(ndb.Model):
         result['num_answered'] = self.num_answered
         result['num_unanswered'] = self.num_unanswered
         result['total_question_views'] = self.total_question_views
+        result['status'] = self.status
+        result['status_string'] = self.status_string
 
         return result
 

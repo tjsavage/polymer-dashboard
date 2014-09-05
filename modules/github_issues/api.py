@@ -51,9 +51,7 @@ class Latest(webapp2.RequestHandler):
 
         result = {}
         result["snapshot"] = snapshot.as_dict()
-        print result
         result["issues"] = [r.as_dict() for r in results]
-        print result["issues"]
 
         self.response.headers['Content-Type'] = 'text/json'
         return self.response.write(json.dumps(result))

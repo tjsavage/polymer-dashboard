@@ -24,6 +24,7 @@ app = webapp2.WSGIApplication([
     ('/tasks/github/delete/', modules.github_issues.tasks.DeleteAllWorker),
 
     ('/api/stackoverflow/', modules.stackoverflow.api.Index),
+    ('/api/stackoverflow/snapshot_status/', modules.stackoverflow.api.SnapshotStatus),
     ('/tasks/stackoverflow/take_snapshot/', modules.stackoverflow.tasks.SnapshotWorker)
 ])
 

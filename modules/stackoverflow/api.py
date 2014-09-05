@@ -19,3 +19,10 @@ class Index(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/json'
         return self.response.write(json.dumps(result))
 
+
+class SnapshotStatus(webapp2.RequestHandler):
+    def get(self):
+        qry = StackOverflowSnapshot.query().order(-StackOverflowSnapshot.requested_time)
+        snapshot = qry.get();
+
+        return self.response.write(json.dumps(snapshot.as_dict()))
